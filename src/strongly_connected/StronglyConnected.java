@@ -3,17 +3,20 @@ import java.util.Collections;
 import java.util.Scanner;
 
 public class StronglyConnected {
-    private static int numberOfStronglyConnectedComponents(ArrayList<Integer>[] adj) {
+    private static int numberOfStronglyConnectedComponents(ArrayList<Integer>[] adj, ArrayList<Integer>[] adj_r) {
         //write your code here
 
         // length of the adj array
         int n = adj.length;
 
+        // vertices visited during dfs()
         int v[] = new int[n];
+        // vertices visited during explore()
         int used[] = new int[n];
+        // postorder numbers go here
         ArrayList<Integer> order = new ArrayList<>(n);
 
-        // while we have unexplored vertices...
+        // while we have unexplored vertices on the original graph...
         for (int i = 0; i < n; i++) {
             if (used[i] == 0) {
                 // ... continue doing DFS
@@ -24,12 +27,13 @@ public class StronglyConnected {
         int counter = 0;
         // now we have the order where the vertex
         // with the largest postorder number sits
-        // at the top of the ArrayList
+        // at the top of the ArrayList.
+        // let's begin exploring the reversed graph
         for (int i : order) {
             if (v[i] == 0) {
                 counter++;
                 // ... continue doing DFS
-                explore(adj, v, i);
+                explore(adj_r, v, i);
             }
         }
 
@@ -67,9 +71,13 @@ public class StronglyConnected {
             }
         }
 
-        // when all adjacent vertices are visited,
-        // insert the current vertex into the output
-        order.add(s);
+        // when all adjacent vertices are explored,
+        // insert the current vertex to the top of the output,
+        // so we can begin doing the second exploration
+        // from the vertex at position 0,
+        // which was completed last,
+        // and thus has the greatest postorder number
+        order.add(0, s);
     }
 
     public static void main(String[] args) {
@@ -81,6 +89,7 @@ public class StronglyConnected {
         for (int i = 0; i < n; i++) {
             adj[i] = new ArrayList<Integer>();
         }
+        // building a reversed graph along with the original one
         for (int i = 0; i < n; i++) {
             adj_r[i] = new ArrayList<Integer>();
         }
@@ -89,10 +98,10 @@ public class StronglyConnected {
             x = scanner.nextInt();
             y = scanner.nextInt();
             adj[x - 1].add(y - 1);
+            // building a reversed graph along with the original one
             adj_r[y - 1].add(x - 1);
         }
-//        System.out.println(numberOfStronglyConnectedComponents(adj));
-        System.out.println(numberOfStronglyConnectedComponents(adj_r));
+        System.out.println(numberOfStronglyConnectedComponents(adj, adj_r));
     }
 }
 
